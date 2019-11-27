@@ -18,12 +18,12 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupFiles()
+        performSelector(inBackground: #selector(setupFiles), with: nil)
         setupNavigationBar()
         setupConstraints()
     }
 
-    func setupFiles() {
+    @objc func setupFiles() {
         let fm = FileManager.default
         let path = Bundle.main.resourcePath!
         let items = try! fm.contentsOfDirectory(atPath: path)
@@ -34,15 +34,21 @@ class ViewController: UIViewController {
                 pictures.append(item)
             }
         }
-        print(pictures)
+        
+        performSelector(onMainThread: #selector(loadTable), with: nil, waitUntilDone: false)
     }
 
+    @objc func loadTable() {
+        picturesTableView.reloadData()
+    }
+    
     func setupNavigationBar() {
         //Navigation Bar Setup
         self.navigationItem.title = navBarTitle
         self.navigationController?.navigationBar.isTranslucent = true
         self.navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationController?.navigationBar.barTintColor = _ColorLiteralType(red: 0.2431372549, green: 0.7647058824, blue: 0.8392156863, alpha: 0.7)
+        //self.navigationController?.navigationBar.barTintColor = _ColorLiteralType(red: 0.2431372549, green: 0.7647058824, blue: 0.8392156863, alpha: 0.7)
+        self.navigationController?.navigationBar.barTintColor = .systemRed
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor:_ColorLiteralType(red: 1, green: 1, blue: 1, alpha: 1)]
     }
 
@@ -54,8 +60,10 @@ class ViewController: UIViewController {
 
         view.addSubview(picturesTableView)
 
+        edgesForExtendedLayout = .top
+        extendedLayoutIncludesOpaqueBars = true
         picturesTableView.translatesAutoresizingMaskIntoConstraints = false
-        picturesTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        picturesTableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         picturesTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         picturesTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         picturesTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
